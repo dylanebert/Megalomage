@@ -8,10 +8,13 @@ public class Caster : MonoBehaviour {
     public Controller[] controllers;
     public Spell[] spells;
     public float tolerance = 2f;
+    [HideInInspector]
+    public Dictionary<SteamVR_TrackedController, Controller> controllerDict;
 
-    Dictionary<SteamVR_TrackedController, Controller> controllerDict;
+    GameManager gameManager;
 
     private void Start() {
+        gameManager = GameObject.FindGameObjectWithTag("GameController").GetComponent<GameManager>();
         controllerDict = new Dictionary<SteamVR_TrackedController, Controller>();
         foreach(Controller controller in controllers) {
             controllerDict.Add(controller.controller, controller);
@@ -22,65 +25,43 @@ public class Caster : MonoBehaviour {
     }
 
     private void Update() {
-        foreach(Controller controller in controllers) {
+        foreach (Controller controller in controllers) {
             if (controller.drawing) {
                 controller.trail.transform.position = controller.controller.transform.position;
                 if(Vector3.Distance(controller.prevPosition, controller.controller.transform.position) > 0.05f) {
                     controller.prevPosition = controller.controller.transform.position;
                     controller.path.Add(controller.controller.transform.position);
                 }
+            } else {
+                controller.helpPath.transform.position = controller.controller.transform.position;
+                controller.DrawHelpPath();
             }
         }
     }
 
     void Grip(object sender, ClickedEventArgs args) {
-        Controller controller = null;
-        int controllerIndex = -1;
-        for (int i = 0; i < 2; i++) {
-            if (controllers[i].controller.GetInstanceID() == ((SteamVR_TrackedController)sender).GetInstanceID()) {
-                controller = controllers[i];
-                controllerIndex = i;
-            }
-        }
-        if (controller == null || controller.readySpell != null) return;
+        Controller controller = controllerDict[((SteamVR_TrackedController)sender)];
+        if (controller.readySpell != null) return;
+
         controller.drawing = true;
-
         controller.path.Clear();
-
-        controller.helpPath.transform.position = controller.controller.transform.position;
-        controller.helpPath.positionCount = spells[0].segments + 1;
-        Vector3[] positions = new Vector3[spells[0].segments + 1];
-        Vector3[] spellPath = controllerIndex == 0 ? spells[0].pathL : spells[0].pathR;
-        for (int i = 0; i < positions.Length; i++) {
-            positions[i] = controller.helpPath.transform.TransformPoint(spellPath[i]);
-        }
-        controller.helpPath.SetPositions(positions);
-        controller.helpPath.enabled = true;
+        controller.anchor.transform.position = controller.controller.transform.position;
     }
 
     void Ungrip(object sender, ClickedEventArgs args) {
-        Controller controller = null;
-        int controllerIndex = -1;
-        for(int i = 0; i < 2; i++) {
-            if (controllers[i].controller.GetInstanceID() == ((SteamVR_TrackedController)sender).GetInstanceID()) {
-                controller = controllers[i];
-                controllerIndex = i;
-            }
-        }
-        if (controller == null) return;
+        Controller controller = controllerDict[((SteamVR_TrackedController)sender)];
         controller.drawing = false;
         controller.helpPath.enabled = false;
 
         if (controller.readySpell != null) return;
 
         Dictionary<Spell, double> distances = new Dictionary<Spell, double>();
+        Vector3[] controllerPath = new Vector3[controller.path.Count];
+        for(int i = 0; i < controllerPath.Length; i++) {
+            controllerPath[i] = controller.anchor.transform.InverseTransformPoint(controller.path[i]);
+        }
         foreach(Spell spell in spells) {
-            Vector3[] positions = new Vector3[spells[0].segments + 1];
-            Vector3[] spellPath = controllerIndex == 0 ? spell.pathL : spell.pathR;
-            for (int i = 0; i < positions.Length; i++) {
-                positions[i] = controller.helpPath.transform.TransformPoint(spellPath[i]);
-            }
-            SimpleDTW dtw = new SimpleDTW(controller.path.ToArray(), positions);
+            SimpleDTW dtw = new SimpleDTW(controllerPath, controller.index == 0 ? spell.pathL : spell.pathR);
             dtw.computeDTW();
             distances.Add(spell, dtw.getSum());
         }
@@ -91,7 +72,7 @@ public class Caster : MonoBehaviour {
             controller.readySpell = min;
             controller.readySpell.Ready(controller);
             Vector3[] positions = new Vector3[spells[0].segments + 1];
-            Vector3[] spellPath = controllerIndex == 0 ? min.pathL : min.pathR;
+            Vector3[] spellPath = controller.index == 0 ? min.pathL : min.pathR;
             for (int i = 0; i < positions.Length; i++) {
                 positions[i] = controller.helpPath.transform.TransformPoint(spellPath[i]);
             }
@@ -100,15 +81,8 @@ public class Caster : MonoBehaviour {
     }
 
     void Trigger(object sender, ClickedEventArgs args) {
-        Controller controller = null;
-        int controllerIndex = -1;
-        for (int i = 0; i < 2; i++) {
-            if (controllers[i].controller.GetInstanceID() == ((SteamVR_TrackedController)sender).GetInstanceID()) {
-                controller = controllers[i];
-                controllerIndex = i;
-            }
-        }
-        if (controller == null || controller.readySpell == null) return;
+        Controller controller = controllerDict[((SteamVR_TrackedController)sender)];
+        if (controller.readySpell == null) return;
         controller.readySpell.Cast(controller);
         controller.readySpell = null;
     }
@@ -127,6 +101,28 @@ public class Caster : MonoBehaviour {
         foreach (ParticleSystem particle in controller.pathBurner.GetComponentsInChildren<ParticleSystem>())
             particle.Stop();
     }
+
+    public void HelpHover(Spell spell) {
+        foreach (Controller controller in controllers) {
+            if (controller.drawing || controller.readySpell != null) return;
+            controller.helpPathPositions = controller.index == 0 ? spell.pathL : spell.pathR;
+            controller.controller.Ungripped += HelpUngrip;
+        }
+    }
+
+    void HelpUngrip(object sender, ClickedEventArgs args) {
+        Controller controller = controllerDict[(SteamVR_TrackedController)sender];
+        controller.helpPath.enabled = false;
+        controller.helpPathPositions = null;
+        ((SteamVR_TrackedController)sender).Ungripped -= HelpUngrip;
+    }
+
+    public void ClearHelpPath() {
+        foreach (Controller controller in controllers) {
+            controller.helpPath.enabled = false;
+            controller.helpPathPositions = null;
+        }
+    }
 }
 
 [System.Serializable]
@@ -138,12 +134,16 @@ public class Controller {
     public LineRenderer aimPath;
     public GameObject pathBurner;
     public bool drawing;
+    public int index;
+    public Transform anchor;
     [HideInInspector]
     public Spell readySpell;
     [HideInInspector]
     public List<Vector3> path;
     [HideInInspector]
     public Vector3 prevPosition;
+    [HideInInspector]
+    public Vector3[] helpPathPositions;
 
     public void Vibrate(ushort duration) {
         SteamVR_Controller.Input((int)controller.controllerIndex).TriggerHapticPulse(duration);
@@ -153,5 +153,16 @@ public class Controller {
         SteamVR_Controller.Input((int)controller.controllerIndex).TriggerHapticPulse(duration);
         yield return new WaitForSeconds(interval);
         SteamVR_Controller.Input((int)controller.controllerIndex).TriggerHapticPulse(duration);
+    }
+
+    public void DrawHelpPath() {
+        if (helpPathPositions == null) return;
+        Vector3[] positions = new Vector3[helpPathPositions.Length];
+        for(int i = 0; i < positions.Length; i++) {
+            positions[i] = helpPath.transform.TransformPoint(helpPathPositions[i]);
+        }
+        helpPath.positionCount = positions.Length;
+        helpPath.SetPositions(positions);
+        helpPath.enabled = true;
     }
 }

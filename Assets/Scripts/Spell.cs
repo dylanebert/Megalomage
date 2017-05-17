@@ -34,7 +34,7 @@ public class Spell : MonoBehaviour {
         else {
             for (int i = 0; i <= segments; i++) {
                 pathL[i] = new Vector3(XL.Evaluate((float)i * 1f / (float)segments), YL.Evaluate((float)i * 1f / (float)segments), ZL.Evaluate((float)i * 1f / (float)segments)) * drawScale;
-                pathR[i] = new Vector3(-XL.Evaluate((float)i * 1f / (float)segments), YL.Evaluate((float)i * 1f / (float)segments), ZL.Evaluate((float)i * 1f / (float)segments)) * drawScale;
+                pathR[i] = new Vector3(XL.Evaluate((float)i * 1f / (float)segments), YL.Evaluate((float)i * 1f / (float)segments), ZL.Evaluate((float)i * 1f / (float)segments)) * drawScale;
             }
         }
     }
