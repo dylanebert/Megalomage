@@ -6,7 +6,6 @@ public class FireballObj : MonoBehaviour {
 
     public GameObject explosionObj;
     public float noise = 50f;
-    public float damage = 100f;
 
     bool active = true;
 
@@ -25,9 +24,6 @@ public class FireballObj : MonoBehaviour {
             if (collision.gameObject.layer != 4) {
                 GameObject explosion = Instantiate(explosionObj, transform.position - transform.forward, Quaternion.identity);
                 Destroy(explosion, 5f);
-            }
-            if(collision.gameObject.layer == 9) {
-                collision.gameObject.GetComponent<Minion>().Damage(damage);
             }
             foreach (ParticleSystem particle in GetComponentsInChildren<ParticleSystem>())
                 particle.Stop();

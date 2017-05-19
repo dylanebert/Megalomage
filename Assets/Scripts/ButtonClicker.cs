@@ -5,8 +5,6 @@ using UnityEngine.UI;
 
 public class ButtonClicker : MonoBehaviour {
 
-    public Caster caster;
-
     SteamVR_LaserPointer pointer;
     Button button;
     GameObject eventSystem;
@@ -23,9 +21,8 @@ public class ButtonClicker : MonoBehaviour {
         if(pointerOnButton) {
             if (SteamVR_Controller.Input((int)GetComponent<SteamVR_TrackedController>().controllerIndex).GetPressDown(Valve.VR.EVRButtonId.k_EButton_SteamVR_Trigger)) {
                 button.onClick.Invoke();
-                pointerOnButton = false;
-                eventSystem.GetComponent<UnityEngine.EventSystems.EventSystem>().SetSelectedGameObject(null);
                 button = null;
+                pointerOnButton = false;
             }
         }
     }
@@ -35,7 +32,7 @@ public class ButtonClicker : MonoBehaviour {
             button = args.target.gameObject.GetComponent<Button>();
             button.Select();
             pointerOnButton = true;
-            caster.controllerDict[GetComponent<SteamVR_TrackedController>()].Vibrate(2000);
+            SteamVR_Controller.Input((int)GetComponent<SteamVR_TrackedController>().controllerIndex).TriggerHapticPulse(2000);
         }
     }
 
