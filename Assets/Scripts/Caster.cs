@@ -6,6 +6,7 @@ using UnityEngine.UI;
 
 public class Caster : MonoBehaviour {
 
+<<<<<<< HEAD
     public SteamVR_TrackedController menuController;
     public SteamVR_TrackedController castController;
     public Image manaBar;
@@ -16,6 +17,14 @@ public class Caster : MonoBehaviour {
 
     GameObject equippedSpell;
     Color manaColor;
+=======
+    public Image manaBar;
+    public float maxMana = 100f;
+    public float manaRegen = 10f;
+
+    Color manaColor;
+    float mana;
+>>>>>>> 0c7af0f844669d3799a247222e1c46432d916e20
 
     private void Start() {
         mana = maxMana;
@@ -30,6 +39,7 @@ public class Caster : MonoBehaviour {
         float v = Mathf.Clamp01(mana / maxMana);
         manaBar.fillAmount = v;
         manaBar.color = Color.Lerp(Color.red, manaColor, v);
+<<<<<<< HEAD
     }
 
     public void EquipSpell(GameObject spell) {
@@ -38,5 +48,18 @@ public class Caster : MonoBehaviour {
         equippedSpell = spell;
         equippedSpell.SetActive(true);
         equippedSpellIcon.sprite = spell.GetComponent<Spell>().icon;
+=======
+    }
+
+    public void ResetMana() {
+        mana = maxMana;
+    }
+
+    public void TryCast(Spell spell, Controller controller) {
+        if (mana > spell.manaCost) {
+            mana -= spell.manaCost;
+            spell.Cast(controller);
+        }
+>>>>>>> 0c7af0f844669d3799a247222e1c46432d916e20
     }
 }

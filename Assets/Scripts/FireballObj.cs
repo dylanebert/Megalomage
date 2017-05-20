@@ -6,7 +6,12 @@ public class FireballObj : MonoBehaviour {
 
     public GameObject explosionObj;
     public float noise = 50f;
+<<<<<<< HEAD
     bool active = false;
+=======
+
+    bool active = true;
+>>>>>>> 0c7af0f844669d3799a247222e1c46432d916e20
 
     private void Start() {
         Destroy(this.gameObject, 10f);
