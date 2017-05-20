@@ -77,11 +77,12 @@ public class GameManager : MonoBehaviour {
         prevGameTime = -10f;
     }
 
-    public void ExitToMainMenu() {
+    public void ShowMainMenu() {
         if(Time.timeScale == 0) {
             pauseMenu.SetActive(false);
             Time.timeScale = 1;
         }
+        ResetLevel();
         mainMenu.SetActive(true);
         pointer.SetActive(true);
         playing = false;
@@ -117,7 +118,7 @@ public class GameManager : MonoBehaviour {
 
     public IEnumerator WinSequence() {
         yield return new WaitForSeconds(2f);
-        ExitToMainMenu();
+        ShowMainMenu();
     }
 
     public IEnumerator LoseSequence() {
@@ -126,7 +127,7 @@ public class GameManager : MonoBehaviour {
             enemy.GetComponent<Animator>().SetTrigger("Victory");
         }
         yield return new WaitForSeconds(2f);
-        ExitToMainMenu();
+        ShowMainMenu();
     }
 }
 

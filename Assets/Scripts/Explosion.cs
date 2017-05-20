@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class ExplosionObj : MonoBehaviour {
+public class Explosion : MonoBehaviour {
 
     public float damage = 100f;
     public float radius = 3f;
