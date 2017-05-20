@@ -6,9 +6,7 @@ public class FireballObj : MonoBehaviour {
 
     public GameObject explosionObj;
     public float noise = 50f;
-    public float damage = 100f;
-
-    bool active = true;
+    bool active = false;
 
     private void Start() {
         Destroy(this.gameObject, 10f);
@@ -19,15 +17,18 @@ public class FireballObj : MonoBehaviour {
             GetComponent<Rigidbody>().AddRelativeForce(new Vector3(Random.Range(-noise, noise), 0, Random.Range(-noise, noise)));
     }
 
+    public void Launch() {
+        active = true;
+        GetComponent<Rigidbody>().AddForce(transform.forward * 25f, ForceMode.Impulse);
+        GetComponentInChildren<LineRenderer>().enabled = false;
+    }
+
     private void OnCollisionEnter(Collision collision) {
         if (active) {
             GetComponent<Rigidbody>().velocity = Vector3.zero;
             if (collision.gameObject.layer != 4) {
-                GameObject explosion = Instantiate(explosionObj, transform.position - transform.forward, Quaternion.identity);
+                GameObject explosion = Instantiate(explosionObj, transform.position - transform.forward * .5f, Quaternion.identity);
                 Destroy(explosion, 5f);
-            }
-            if(collision.gameObject.layer == 9) {
-                collision.gameObject.GetComponent<Minion>().Damage(damage);
             }
             foreach (ParticleSystem particle in GetComponentsInChildren<ParticleSystem>())
                 particle.Stop();

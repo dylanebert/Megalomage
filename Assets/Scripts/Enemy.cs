@@ -1,22 +1,33 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class Enemy : MonoBehaviour {
 
+    public Image healthBar;
     public float speed = 0.5f; //Units per second
     public float health = 100f;
 
-    bool alive = true;
-    GameManager gameManager;
+    float maxHealth;
+    protected bool alive = true;
+
+    protected GameManager gameManager;
 
     private void Start() {
         gameManager = GameObject.FindGameObjectWithTag("GameController").GetComponent<GameManager>();
+        maxHealth = health;
     }
 
     private void Update() {
         if (!gameManager.playing || !alive) return;
-        transform.Translate(Vector3.forward * Time.deltaTime * speed, Space.Self);
+        transform.Translate(Vector3.forward * Time.deltaTime * speed);
+    }
+
+    private void OnGUI() {
+        float v = Mathf.Clamp01(health / maxHealth);
+        healthBar.fillAmount = v;
+        healthBar.color = Color.Lerp(Color.red, Color.green, v);
     }
 
     public void Damage(float damage) {

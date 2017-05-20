@@ -6,13 +6,16 @@ public class GameManager : MonoBehaviour {
 
     [HideInInspector]
     public List<GameObject> enemies;
+    public SteamVR_TrackedController[] controllers;
+    public Barricade[] barricades;
     public SteamVR_LaserPointer pointer;
     public GameObject mainMenu;
     public GameObject pauseMenu;
     public Level[] levels;
     public bool playing;
-    public float waveInterval = 15f;
+    public float waveInterval = 5f;
 
+    Caster caster;
     float gameTimer = 0f;
     float prevGameTime = -10f;
     int currentLevel;
@@ -20,6 +23,9 @@ public class GameManager : MonoBehaviour {
 
     private void Start() {
         enemies = new List<GameObject>();
+        caster = GameObject.FindGameObjectWithTag("Player").GetComponent<Caster>();
+        foreach (SteamVR_TrackedController controller in controllers)
+            controller.MenuButtonClicked += TogglePauseMenu;
     }
 
     private void Update() {
@@ -30,21 +36,16 @@ public class GameManager : MonoBehaviour {
             prevGameTime += waveInterval;
             if (currentWave < levels[currentLevel].numWaves)
                 SpawnWave();
-            else {
-                if (enemies.Count == 0) {
-                    Stop();
-                    ShowMainMenu();
-                }
-            }
         }
+
+        if (enemies.Count == 0 && currentWave >= levels[currentLevel].numWaves)
+            StartCoroutine(WinSequence());
     }
 
     void SpawnWave() {
         List<Vector3> emptyPositions = new List<Vector3>();
         for(float x = -3f; x <= 3f; x += 1.5f) {
-            for(float z = 40f; z < 50f; z += 1f) {
-                emptyPositions.Add(new Vector3(x, 0, z));
-            }
+            emptyPositions.Add(new Vector3(x, 0, 40f));
         }
         for(int i = 0; i < levels[currentLevel].enemyCurves.Length; i++) {
             for(int j = Mathf.RoundToInt(levels[currentLevel].enemyCurves[i].spawnRate.Evaluate(currentWave)); j > 0; j--) {
@@ -58,22 +59,30 @@ public class GameManager : MonoBehaviour {
     }
 
     public void StartGame() {
+        ResetLevel();
         playing = true;
-        gameTimer = 0f;
-        prevGameTime = -10f;
-        currentWave = 0;
+        caster.mana = caster.maxMana;
     }
 
-    public void Stop() {
-        playing = false;
-        while(enemies.Count > 0) {
+    public void ResetLevel() {
+        while (enemies.Count > 0) {
             GameObject enemy = enemies[0];
             enemies.Remove(enemy);
             Destroy(enemy);
         }
+        foreach (Barricade barricade in barricades)
+            barricade.ResetHealth();
+        currentWave = 0;
+        gameTimer = 0f;
+        prevGameTime = -10f;
     }
 
-    public void ShowMainMenu() {
+    public void ExitToMainMenu() {
+        ResetLevel();
+        if(Time.timeScale == 0) {
+            pauseMenu.SetActive(false);
+            Time.timeScale = 1;
+        }
         mainMenu.SetActive(true);
         pointer.SetActive(true);
         playing = false;
@@ -84,16 +93,41 @@ public class GameManager : MonoBehaviour {
         pointer.SetActive(false);
     }
 
+    public void TogglePauseMenu(object sender, ClickedEventArgs args) {
+        if (Time.timeScale != 0)
+            ShowPauseMenu();
+        else
+            HidePauseMenu();
+    }
+
     public void ShowPauseMenu() {
+        if (mainMenu.activeSelf) return;
         pauseMenu.SetActive(true);
         pointer.SetActive(true);
         playing = false;
+        Time.timeScale = 0;
     }
 
     public void HidePauseMenu() {
+        if (mainMenu.activeSelf) return;
         pauseMenu.SetActive(false);
         pointer.SetActive(false);
         playing = true;
+        Time.timeScale = 1;
+    }
+
+    public IEnumerator WinSequence() {
+        yield return new WaitForSeconds(2f);
+        ExitToMainMenu();
+    }
+
+    public IEnumerator LoseSequence() {
+        playing = false;
+        foreach (GameObject enemy in enemies) {
+            enemy.GetComponent<Animator>().SetTrigger("Victory");
+        }
+        yield return new WaitForSeconds(2f);
+        ExitToMainMenu();
     }
 }
 

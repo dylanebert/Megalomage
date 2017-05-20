@@ -1,33 +1,41 @@
 fileFormatVersion: 2
 guid: cd8d6f043af596e478eb53c84189676a
-timeCreated: 1494977215
+timeCreated: 1495228812
 licenseType: Free
 ModelImporter:
   serializedVersion: 19
   fileIDToRecycleName:
-    100000: Body
+    100000: Armature
     100002: Foot_L
     100004: Foot_R
     100006: Hand_L
     100008: Hand_R
-    100010: Mesh
+    100010: Hood
     100012: //RootNode
-    100014: Minion
-    400000: Body
+    100014: Minion_Mesh
+    100016: Skirt
+    100018: Sword
+    400000: Armature
     400002: Foot_L
     400004: Foot_R
     400006: Hand_L
     400008: Hand_R
-    400010: Mesh
+    400010: Hood
     400012: //RootNode
-    400014: Minion
-    4300000: Mesh
+    400014: Minion_Mesh
+    400016: Skirt
+    400018: Sword
+    4300000: Minion_Mesh
+    4300002: Sword
     7400000: Default Take
-    7400002: Die
-    7400004: Walk
-    7400006: Walk_001
+    7400002: Attack
+    7400004: Die
+    7400006: Victory
+    7400008: Walk_001
+    7400010: Walk
     9500000: //RootNode
-    13700000: Mesh
+    13700000: Minion_Mesh
+    13700002: Sword
   materials:
     importMaterials: 1
     materialName: 0
@@ -52,10 +60,10 @@ ModelImporter:
     extraExposedTransformPaths: []
     clipAnimations:
     - serializedVersion: 16
-      name: Die
-      takeName: Die
+      name: Attack
+      takeName: Attack
       firstFrame: -1
-      lastFrame: 39
+      lastFrame: 24
       wrapMode: 0
       orientationOffsetY: 0
       level: 0
@@ -78,19 +86,119 @@ ModelImporter:
       transformMask:
       - path: 
         weight: 1
-      - path: Mesh
+      - path: Armature
         weight: 1
-      - path: Minion
+      - path: Armature/Foot_L
         weight: 1
-      - path: Minion/Body
+      - path: Armature/Foot_R
         weight: 1
-      - path: Minion/Foot_L
+      - path: Armature/Hand_L
         weight: 1
-      - path: Minion/Foot_R
+      - path: Armature/Hand_R
         weight: 1
-      - path: Minion/Hand_L
+      - path: Armature/Skirt
         weight: 1
-      - path: Minion/Hand_R
+      - path: Armature/Skirt/Hood
+        weight: 1
+      - path: Minion_Mesh
+        weight: 1
+      - path: Sword
+        weight: 1
+      maskType: 3
+      maskSource: {instanceID: 0}
+      additiveReferencePoseFrame: 0
+    - serializedVersion: 16
+      name: Die
+      takeName: Die
+      firstFrame: -1
+      lastFrame: 9
+      wrapMode: 0
+      orientationOffsetY: 0
+      level: 0
+      cycleOffset: 0
+      loop: 0
+      hasAdditiveReferencePose: 0
+      loopTime: 0
+      loopBlend: 0
+      loopBlendOrientation: 0
+      loopBlendPositionY: 0
+      loopBlendPositionXZ: 0
+      keepOriginalOrientation: 0
+      keepOriginalPositionY: 1
+      keepOriginalPositionXZ: 0
+      heightFromFeet: 0
+      mirror: 0
+      bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
+      curves: []
+      events: []
+      transformMask:
+      - path: 
+        weight: 1
+      - path: Armature
+        weight: 1
+      - path: Armature/Foot_L
+        weight: 1
+      - path: Armature/Foot_R
+        weight: 1
+      - path: Armature/Hand_L
+        weight: 1
+      - path: Armature/Hand_R
+        weight: 1
+      - path: Armature/Skirt
+        weight: 1
+      - path: Armature/Skirt/Hood
+        weight: 1
+      - path: Minion_Mesh
+        weight: 1
+      - path: Sword
+        weight: 1
+      maskType: 3
+      maskSource: {instanceID: 0}
+      additiveReferencePoseFrame: 0
+    - serializedVersion: 16
+      name: Victory
+      takeName: Victory
+      firstFrame: -1
+      lastFrame: 19
+      wrapMode: 0
+      orientationOffsetY: 0
+      level: 0
+      cycleOffset: 0
+      loop: 0
+      hasAdditiveReferencePose: 0
+      loopTime: 0
+      loopBlend: 0
+      loopBlendOrientation: 0
+      loopBlendPositionY: 0
+      loopBlendPositionXZ: 0
+      keepOriginalOrientation: 0
+      keepOriginalPositionY: 1
+      keepOriginalPositionXZ: 0
+      heightFromFeet: 0
+      mirror: 0
+      bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
+      curves: []
+      events: []
+      transformMask:
+      - path: 
+        weight: 1
+      - path: Armature
+        weight: 1
+      - path: Armature/Foot_L
+        weight: 1
+      - path: Armature/Foot_R
+        weight: 1
+      - path: Armature/Hand_L
+        weight: 1
+      - path: Armature/Hand_R
+        weight: 1
+      - path: Armature/Skirt
+        weight: 1
+      - path: Armature/Skirt/Hood
+        weight: 1
+      - path: Minion_Mesh
+        weight: 1
+      - path: Sword
         weight: 1
       maskType: 3
       maskSource: {instanceID: 0}
@@ -122,19 +230,23 @@ ModelImporter:
       transformMask:
       - path: 
         weight: 1
-      - path: Mesh
+      - path: Armature
         weight: 1
-      - path: Minion
+      - path: Armature/Foot_L
         weight: 1
-      - path: Minion/Body
+      - path: Armature/Foot_R
         weight: 1
-      - path: Minion/Foot_L
+      - path: Armature/Hand_L
         weight: 1
-      - path: Minion/Foot_R
+      - path: Armature/Hand_R
         weight: 1
-      - path: Minion/Hand_L
+      - path: Armature/Skirt
         weight: 1
-      - path: Minion/Hand_R
+      - path: Armature/Skirt/Hood
+        weight: 1
+      - path: Minion_Mesh
+        weight: 1
+      - path: Sword
         weight: 1
       maskType: 3
       maskSource: {instanceID: 0}

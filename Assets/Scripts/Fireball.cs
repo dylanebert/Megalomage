@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -6,17 +7,30 @@ public class Fireball : Spell {
 
     public GameObject fireballObj;
 
-    public override void OnReady(Controller controller) {
-        controller.fire.Play();
-        controller.aimPath.enabled = true;
+    GameObject fireball;
+    bool charging;
+
+    private void OnEnable() {
+        caster.castController.TriggerClicked += TriggerDown;
+        caster.castController.TriggerUnclicked += TriggerUp;
     }
 
-    public override void OnCast(Controller controller) {
-        GameObject fireball = Instantiate(fireballObj, controller.controller.transform.position, Quaternion.identity);
-        fireball.transform.forward = controller.controller.transform.forward;
-        fireball.GetComponent<Rigidbody>().AddForce(fireball.transform.forward * 25f, ForceMode.Impulse);
-        controller.fire.Stop();
-        controller.aimPath.enabled = false;
-        controller.Vibrate(3000);
+    private void OnDisable() {
+        caster.castController.TriggerClicked -= TriggerDown;
+        caster.castController.TriggerUnclicked -= TriggerUp;
+    }
+
+    void TriggerDown(object sender, ClickedEventArgs args) {
+        if (caster.mana < manaCost) return;
+        charging = true;
+        fireball = Instantiate(fireballObj, transform);
+        caster.mana -= manaCost;
+    }
+
+    void TriggerUp(object sender, ClickedEventArgs args) {
+        if (!charging || fireball == null) return;
+        charging = false;
+        fireball.GetComponent<FireballObj>().Launch();
+        fireball.transform.parent = null;
     }
 }
