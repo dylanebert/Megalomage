@@ -6,12 +6,7 @@ public class GameManager : MonoBehaviour {
 
     [HideInInspector]
     public List<GameObject> enemies;
-<<<<<<< HEAD
     public SteamVR_TrackedController[] controllers;
-=======
-    public Controller[] controllers;
-    public GameObject[] controllerMenus;
->>>>>>> 0c7af0f844669d3799a247222e1c46432d916e20
     public Barricade[] barricades;
     public SteamVR_LaserPointer pointer;
     public GameObject mainMenu;
@@ -29,13 +24,8 @@ public class GameManager : MonoBehaviour {
     private void Start() {
         enemies = new List<GameObject>();
         caster = GameObject.FindGameObjectWithTag("Player").GetComponent<Caster>();
-<<<<<<< HEAD
         foreach (SteamVR_TrackedController controller in controllers)
             controller.MenuButtonClicked += TogglePauseMenu;
-=======
-        foreach (Controller controller in controllers)
-            controller.controller.MenuButtonClicked += TogglePauseMenu;
->>>>>>> 0c7af0f844669d3799a247222e1c46432d916e20
     }
 
     private void Update() {
@@ -70,21 +60,11 @@ public class GameManager : MonoBehaviour {
 
     public void StartGame() {
         ResetLevel();
-<<<<<<< HEAD
         playing = true;
         caster.mana = caster.maxMana;
     }
 
     public void ResetLevel() {
-=======
-        ActivateControllers();
-        playing = true;
-        caster.ResetMana();
-    }
-
-    public void ResetLevel() {
-        DeactivateControllers();
->>>>>>> 0c7af0f844669d3799a247222e1c46432d916e20
         while (enemies.Count > 0) {
             GameObject enemy = enemies[0];
             enemies.Remove(enemy);
@@ -95,29 +75,9 @@ public class GameManager : MonoBehaviour {
         currentWave = 0;
         gameTimer = 0f;
         prevGameTime = -10f;
-<<<<<<< HEAD
-=======
-    }
-
-    void ActivateControllers() {
-        foreach (GameObject menu in controllerMenus)
-            menu.SetActive(true);
-    }
-
-    void DeactivateControllers() {
-        foreach (Controller controller in controllers) {
-            controller.ToggleAimPath(false);
-            controller.SetAimPathColor(Color.white);
-            controller.selectedSpellIndex = -1;
-            controller.handFire.Stop();
-        }
-        foreach (GameObject menu in controllerMenus)
-            menu.SetActive(false);
->>>>>>> 0c7af0f844669d3799a247222e1c46432d916e20
     }
 
     public void ExitToMainMenu() {
-        ResetLevel();
         if(Time.timeScale == 0) {
             pauseMenu.SetActive(false);
             Time.timeScale = 1;
@@ -141,10 +101,6 @@ public class GameManager : MonoBehaviour {
 
     public void ShowPauseMenu() {
         if (mainMenu.activeSelf) return;
-<<<<<<< HEAD
-=======
-        DeactivateControllers();
->>>>>>> 0c7af0f844669d3799a247222e1c46432d916e20
         pauseMenu.SetActive(true);
         pointer.SetActive(true);
         playing = false;
@@ -153,10 +109,6 @@ public class GameManager : MonoBehaviour {
 
     public void HidePauseMenu() {
         if (mainMenu.activeSelf) return;
-<<<<<<< HEAD
-=======
-        ActivateControllers();
->>>>>>> 0c7af0f844669d3799a247222e1c46432d916e20
         pauseMenu.SetActive(false);
         pointer.SetActive(false);
         playing = true;

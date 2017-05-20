@@ -35,7 +35,8 @@ public class Enemy : MonoBehaviour {
         health -= damage;
         if (health <= 0) {
             GetComponent<Animator>().SetTrigger("Die");
-            GetComponent<Collider>().enabled = false;
+            foreach(Collider col in GetComponents<Collider>())
+                col.enabled = false;
             gameManager.enemies.Remove(this.gameObject);
             Destroy(this.gameObject, 2f);
             alive = false;
