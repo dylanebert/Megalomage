@@ -61,7 +61,6 @@ public class GameManager : MonoBehaviour {
     public void StartGame() {
         ResetLevel();
         playing = true;
-        caster.mana = caster.maxMana;
     }
 
     public void ResetLevel() {

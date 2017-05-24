@@ -15,7 +15,8 @@ public class Fireball : MonoBehaviour {
     ParticleSystem.MainModule orbModule;
     [HideInInspector]
     public bool charging = false;
-    float intensity;
+    [HideInInspector]
+    public float intensity;
     float cooldownTimer;
 
     private void Start() {
@@ -55,5 +56,6 @@ public class Fireball : MonoBehaviour {
         fireball.Launch();
         cooldownTimer = cooldown;
         fireball = null;
+        GameObject.FindGameObjectWithTag("Player").GetComponent<Caster>().Vibrate(2000);
     }
 }
